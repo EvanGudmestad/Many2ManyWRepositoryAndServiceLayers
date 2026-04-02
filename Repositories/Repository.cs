@@ -11,6 +11,10 @@ namespace BookAuthors.Repositories
         Task<IEnumerable<T>> GetAllAsync(QueryOptions<T> options);
         Task AddAsync(T entity);
 
+        Task<T?> GetByIdAsync(int id);
+        Task UpdateAsync(T entity);
+
+
     }
 
 
@@ -47,9 +51,20 @@ namespace BookAuthors.Repositories
            return await _dbSet.ToListAsync();
         }
 
+        public virtual async Task<T?> GetByIdAsync(int id)
+        {
+           return await _dbSet.FindAsync(id);
+        }
+
         public virtual async Task SaveAsync()
         {
             await _context.SaveChangesAsync();
+        }
+
+        public virtual async Task UpdateAsync(T entity)
+        {
+           _dbSet.Update(entity);
+            await SaveAsync();
         }
     }
 }

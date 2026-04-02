@@ -11,6 +11,13 @@ namespace BookAuthors.Services
 
         Task UpdateBookAuthorsAsync(int bookId, IEnumerable<int> authorIds);
 
+        Task<Book?> GetBookByIdAsync(int id);
+
+        Task<Book?> GetBookWithAuthorsAsync(int id);
+
+        Task<ServiceResult> UpdateBookAsync(Book book);
+
+
 
 
     }
@@ -32,9 +39,32 @@ namespace BookAuthors.Services
             return await _bookRepository.GetAllAsync(options);
         }
 
+        public async Task<Book?> GetBookByIdAsync(int id)
+        {
+            return await _bookRepository.GetByIdAsync(id);
+        }
+
+        public async Task<Book?> GetBookWithAuthorsAsync(int id)
+        {
+           return await _bookRepository.GetBookWithAuthorsAsync(id);
+        }
+
+        public async Task<ServiceResult> UpdateBookAsync(Book book)
+        {
+            await _bookRepository.UpdateAsync(book);
+            return ServiceResult.Ok();
+        }
+
         public async Task UpdateBookAuthorsAsync(int bookId, IEnumerable<int> authorIds)
         {
-            await _bookRepository.UpdateBookAuthorsAsync(bookId, authorIds);
+
+           await _bookRepository.UpdateBookAuthorsAsync(bookId, authorIds);
+
+        }
+
+        Task IBookService.UpdateBookAuthorsAsync(int bookId, IEnumerable<int> authorIds)
+        {
+            return UpdateBookAuthorsAsync(bookId, authorIds);
         }
 
         //public async Task<ServiceResult<Book>> CreateBookAsync(Book book)

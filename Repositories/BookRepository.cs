@@ -8,6 +8,8 @@ namespace BookAuthors.Repositories
     {
         Task<Book?> GetBookWithAuthorsAsync(int id);
         Task UpdateBookAuthorsAsync(int bookId, IEnumerable<int> authorIds);
+
+
     }
     public class BookRepository(ApplicationDbContext context) : Repository<Book>(context), IBookRepository
     {

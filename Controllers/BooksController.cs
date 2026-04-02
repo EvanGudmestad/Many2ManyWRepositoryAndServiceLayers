@@ -28,7 +28,6 @@ namespace BookAuthors.Controllers
             return View(viewModel);
         }
 
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(BookViewModel viewModel)
@@ -42,5 +41,43 @@ namespace BookAuthors.Controllers
             }
             return RedirectToAction(nameof(Index));
         }
+
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
+        {
+            var book = await _bookService.GetBookWithAuthorsAsync(id);
+            if (book == null)
+            {
+                return NotFound();
+            }
+            var allAuthors = await _authorService.GetAllAuthorsAsync();
+            var viewModel = new BookViewModel
+            {
+                BookId = book.BookId,
+                Title = book.Title,
+                AvailableAuthors = allAuthors.ToList(),
+                SelectedAuthorIds = book.Authors.Select(a => a.AuthorId).ToList(),
+            };
+            return View(viewModel);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Edit(int id, BookViewModel viewModel)
+        {
+            if (id != viewModel.BookId)
+            {
+                return NotFound();
+            }
+            var book = new Book { BookId = viewModel.BookId, Title = viewModel.Title };
+
+            var result = await _bookService.UpdateBookAsync(book);
+
+            await _bookService.UpdateBookAuthorsAsync(id, viewModel.SelectedAuthorIds);
+
+            return RedirectToAction(nameof(Index));
+
+
+        }
+
     }
 }
