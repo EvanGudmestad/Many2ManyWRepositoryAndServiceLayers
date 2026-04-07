@@ -17,6 +17,9 @@ namespace BookAuthors.Services
 
         Task<ServiceResult> UpdateBookAsync(Book book);
 
+        Task DeleteBookAsync(int id);
+
+
 
 
 
@@ -29,6 +32,11 @@ namespace BookAuthors.Services
         {
             await _bookRepository.AddAsync(book);
             return ServiceResult<Book>.Ok(book);
+        }
+
+        public async Task DeleteBookAsync(int id)
+        {
+            await _bookRepository.DeleteAsync(id);
         }
 
         public async Task<IEnumerable<Book>> GetAllBooksWithAuthorsAsync()

@@ -79,5 +79,54 @@ namespace BookAuthors.Controllers
 
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var book = await _bookService.GetBookWithAuthorsAsync(id);
+            if (book == null)
+            {
+                return NotFound();
+            }
+            return View(book);
+        }
+
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            await _bookService.DeleteBookAsync(id);
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Details(int id)
+        {
+            var book = await _bookService.GetBookWithAuthorsAsync(id);
+            if (book == null)
+            {
+                return NotFound();
+            }
+
+            var allAuthors = await _authorService.GetAllAuthorsAsync();
+            var viewModel = new BookViewModel
+            {
+                BookId = book.BookId,
+                Title = book.Title,
+                CurrentAuthors = book.Authors.ToList(),
+                AvailableAuthors = allAuthors.ToList(),
+                SelectedAuthorIds = book.Authors.Select(a => a.AuthorId).ToList()
+            };
+
+            return View(viewModel);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateAuthors(int id, List<int> selectedAuthorIds)
+        {
+            await _bookService.UpdateBookAuthorsAsync(id, selectedAuthorIds);
+            return RedirectToAction(nameof(Details), new { id });
+        }
+
     }
 }

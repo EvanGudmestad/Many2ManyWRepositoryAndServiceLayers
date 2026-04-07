@@ -13,6 +13,7 @@ namespace BookAuthors.Repositories
 
         Task<T?> GetByIdAsync(int id);
         Task UpdateAsync(T entity);
+        Task DeleteAsync(int id);
 
 
     }
@@ -39,6 +40,16 @@ namespace BookAuthors.Repositories
         {
             await _dbSet.AddAsync(entity);
             await SaveAsync();
+        }
+
+        public virtual async Task DeleteAsync(int id)
+        {
+            var entity = await GetByIdAsync(id);
+            if (entity != null)
+            {
+                _dbSet.Remove(entity);
+                await SaveAsync();
+            }
         }
 
         public virtual async Task<IEnumerable<T>> GetAllAsync(QueryOptions<T> options)
