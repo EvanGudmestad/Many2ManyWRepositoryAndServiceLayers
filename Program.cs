@@ -1,6 +1,7 @@
 using BookAuthors.Data;
 using BookAuthors.Repositories;
 using BookAuthors.Services;
+using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -23,6 +24,8 @@ builder.Services.AddScoped<IAuthorRepository, AuthorRepository>();
 builder.Services.AddScoped<IBookService, BookService>();
 builder.Services.AddScoped<IAuthorService, AuthorService>();
 
+// Register FluentValidation
+builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
 builder.Services.AddControllersWithViews();
 

@@ -1,6 +1,7 @@
 ﻿using BookAuthors.Infrastructure;
 using BookAuthors.Models;
 using BookAuthors.Repositories;
+using FluentValidation;
 
 namespace BookAuthors.Services
 {
@@ -24,12 +25,20 @@ namespace BookAuthors.Services
 
 
     }
-    public class BookService(IBookRepository bookRepository) : IBookService
+    public class BookService(IBookRepository bookRepository, IValidator<Book> validator) : IBookService
     {
         private readonly IBookRepository _bookRepository = bookRepository;
+        private readonly IValidator<Book> _validator = validator;
 
         public async Task<ServiceResult<Book>> CreateBookAsync(Book book)
         {
+            var validationResult = await _validator.ValidateAsync(book);
+
+            if (!validationResult.IsValid)
+            {
+                return ServiceResult<Book>.Fail(validationResult.Errors);
+            }
+
             await _bookRepository.AddAsync(book);
             return ServiceResult<Book>.Ok(book);
         }
@@ -59,6 +68,12 @@ namespace BookAuthors.Services
 
         public async Task<ServiceResult> UpdateBookAsync(Book book)
         {
+            var validationResult = await _validator.ValidateAsync(book);
+
+            if (!validationResult.IsValid)
+            {
+                return ServiceResult.Fail(validationResult.Errors);
+            }
             await _bookRepository.UpdateAsync(book);
             return ServiceResult.Ok();
         }
@@ -75,9 +90,6 @@ namespace BookAuthors.Services
             return UpdateBookAuthorsAsync(bookId, authorIds);
         }
 
-        //public async Task<ServiceResult<Book>> CreateBookAsync(Book book)
-        //{
-
-        //}
+       
     }
 }

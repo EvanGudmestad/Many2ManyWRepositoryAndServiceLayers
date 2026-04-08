@@ -35,6 +35,16 @@ namespace BookAuthors.Controllers
             var book = new Book { Title = viewModel.Title };
             var result = await _bookService.CreateBookAsync(book);
 
+            if (!result.Success)
+            {
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+                }
+                viewModel.AvailableAuthors = (await _authorService.GetAllAuthorsAsync()).ToList();
+                return View(viewModel);
+            }
+
             if (viewModel.SelectedAuthorIds.Count > 0)
             {
                 await _bookService.UpdateBookAuthorsAsync(result.Data!.BookId, viewModel.SelectedAuthorIds);
@@ -72,6 +82,15 @@ namespace BookAuthors.Controllers
 
             var result = await _bookService.UpdateBookAsync(book);
 
+            if (!result.Success)
+            {
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+                }
+                viewModel.AvailableAuthors = (await _authorService.GetAllAuthorsAsync()).ToList();
+                return View(viewModel);
+            }
             await _bookService.UpdateBookAuthorsAsync(id, viewModel.SelectedAuthorIds);
 
             return RedirectToAction(nameof(Index));
